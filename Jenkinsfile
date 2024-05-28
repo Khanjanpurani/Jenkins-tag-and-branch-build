@@ -1,9 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:19.03.12' // Docker image with Docker CLI
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+        }
+    }
     
     environment {
         DOCKER_REGISTRY = "https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects"  // Docker registry URL
-        DOCKER_CREDENTIALS_ID = "docker-credentials"  // Jenkins credentials ID for Docker registry
+        DOCKER_CREDENTIALS_ID = credentials('dockerhub')  // Jenkins credentials ID for Docker registry
     }
     
     stages {
@@ -20,10 +25,10 @@ pipeline {
         stage('Build and Deploy') {
             steps {
                 script {
-                    // Check if it's a tag-based deployment
-                    if (env.GIT_BRANCH.startsWith('refs/tags/')) {
-                        echo "Tag-based deployment detected"
-                        def tagName = env.GIT_BRANCH.replace('refs/tags/', '')
+                    def branchName = env.GIT_BRANCH
+                    if (branchName.startsWith('refs/tags/')) {
+                        // Tag-based deployment
+                        def tagName = branchName.replace('refs/tags/', '')
                         def imageName = "your_image_name:${tagName}"
                         
                         // Build the Docker image
@@ -33,17 +38,12 @@ pipeline {
                         docker.withRegistry(DOCKER_REGISTRY, DOCKER_CREDENTIALS_ID) {
                             image.push()
                         }
-                        
                     } else {
-                        echo "Branch-based deployment detected"
-                        
                         // Branch-based deployment
-                        // Build the Docker image with the branch name
-                        def imageName = "your_image_name:${env.GIT_BRANCH}"
-                        def image = docker.build(imageName)
+                        def branchImageName = "your_image_name:${branchName.replace('origin/', '')}"
+                        def branchImage = docker.build(branchImageName)
                         
-                        // Deploy locally (customize as per your local deployment process)
-                        // Example: Deploy using docker-compose
+                        // Deploy locally (example using docker-compose)
                         sh 'docker-compose up -d'
                     }
                 }
