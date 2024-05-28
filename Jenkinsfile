@@ -43,8 +43,10 @@ pipeline {
                         def branchImageName = "your_image_name:${branchName.replace('origin/', '')}"
                         def branchImage = docker.build(branchImageName)
                         
-                        // Deploy locally (example using docker-compose)
-                        sh 'docker-compose up -d'
+                        // Deploy locally using Docker
+                        branchImage.inside {
+                            sh 'docker run -d -p 8080:8080 your_image_name:latest'
+                        }
                     }
                 }
             }
