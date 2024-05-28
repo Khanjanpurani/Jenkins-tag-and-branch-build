@@ -9,6 +9,7 @@ pipeline {
     environment {
         DOCKER_REGISTRY = "https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects"  // Docker registry URL
         DOCKER_CREDENTIALS_ID = credentials('dockerhub')  // Jenkins credentials ID for Docker registry
+        DOCKER_BINARY_PATH = "/usr/bin/docker" // Full path to Docker binary
     }
     
     stages {
@@ -45,7 +46,7 @@ pipeline {
                         
                         // Deploy locally using Docker
                         branchImage.inside {
-                            sh 'docker run -d -p 8080:8080 your_image_name:latest'
+                            sh "${DOCKER_BINARY_PATH} run -d -p 8080:8080 your_image_name:latest"
                         }
                     }
                 }
