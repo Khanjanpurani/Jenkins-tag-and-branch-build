@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         DOCKER_REGISTRY = "https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects"  
-        DOCKER_CREDENTIALS_ID = credentials('dockerhub')  
+        DOCKER_CREDENTIALS_ID = credentials('dockerhub-credentials')  
     }
     
     stages {
