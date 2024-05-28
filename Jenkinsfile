@@ -49,9 +49,16 @@ pipeline {
 
             // Deploy locally using Docker
             branchImage.inside {
-              sh """
-                ${DOCKER_BINARY_PATH} run -d -p 8080:8080 your_image_name:latest
-              """ // Consider adding error handling for "sh" step
+              // Option 1: Using single quotes (recommended)
+            //  sh '''
+            //    ${DOCKER_BINARY_PATH} run -d -p 8080:8080 your_image_name:latest
+            //  '''
+
+              // Option 2: Specifying full command path
+               sh "/usr/bin/docker run -d -p 8080:8080 your_image_name:latest"
+
+              // Option 3: Using different shell (less common)
+              // sh '/bin/bash -c "/usr/bin/docker run -d -p 8080:8080 your_image_name:latest"'
             }
           }
         }
