@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git'
+                git branch: 'main', url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git'
             }
         }
 
@@ -51,7 +51,7 @@ pipeline {
 
     post {
         always {
-            cleanWs() 
+            cleanWs()
         }
     }
 }
