@@ -27,8 +27,6 @@ pipeline {
             }
             steps {
                 script {
-                    def username = credentials('docker_username').username
-                    def password = credentials('docker_password').password
                     withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         bat 'docker login -u %USERNAME% -p %PASSWORD%'
                         bat 'docker push my-image:latest'
@@ -43,7 +41,18 @@ pipeline {
             }
             steps {
                 script {
-                    bat 'start /B docker run -p 8000:80 my-image:latest'
+                    // Stop any running containers to avoid conflicts
+                    bat 'docker stop my-container || true'
+                    bat 'docker rm my-container || true'
+                    
+                    // Run the container in detached mode
+                    bat 'docker run -d --name my-container -p 8000:80 my-image:latest'
+
+                    // Check running containers
+                    bat 'docker ps'
+
+                    // Show logs for the new container
+                    bat 'docker logs my-container'
                 }
             }
         }
@@ -51,7 +60,7 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            cleanWs() // Clean workspace after each build
         }
     }
 }
