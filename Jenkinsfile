@@ -6,10 +6,21 @@ pipeline {
         PASSWORD = credentials('docker_password')
     }
 
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch or tag to build')
+        booleanParam(name: 'IS_TAG_BUILD', defaultValue: false, description: 'Is this a tag build?')
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git'
+                script {
+                    if (params.IS_TAG_BUILD) {
+                        git url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git', branch: "refs/tags/${params.BRANCH_NAME}"
+                    } else {
+                        git url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git', branch: "${params.BRANCH_NAME}"
+                    }
+                }
             }
         }
 
@@ -23,13 +34,14 @@ pipeline {
 
         stage('Push Image (Tag Build Only)') {
             when {
-                expression { return params.IS_TAG_BUILD } 
+                expression { return params.IS_TAG_BUILD }
             }
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         bat 'docker login -u %USERNAME% -p %PASSWORD%'
-                        bat 'docker push my-image:latest'
+                        bat 'docker tag my-image:latest your-dockerhub-username/my-image:${params.BRANCH_NAME}'
+                        bat 'docker push your-dockerhub-username/my-image:${params.BRANCH_NAME}'
                     }
                 }
             }
@@ -37,7 +49,7 @@ pipeline {
 
         stage('Deploy to Local (Branch Build Only)') {
             when {
-                expression { return !params.IS_TAG_BUILD } 
+                expression { return !params.IS_TAG_BUILD }
             }
             steps {
                 script {
