@@ -2,11 +2,9 @@ pipeline {
     agent any
 
     environment {
-        
         USERNAME = credentials('docker_username')
         PASSWORD = credentials('docker_password')
     }
-
 
     stages {
         stage('Checkout Code') {
@@ -17,7 +15,9 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh 'docker build -t my-image:latest .' 
+                script {
+                    bat 'docker build -t my-image:latest .'
+                }
             }
         }
 
@@ -29,9 +29,9 @@ pipeline {
                 script {
                     def username = credentials('docker_username').username
                     def password = credentials('docker_password').password
-                    docker.withRegistry('https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects', credentialsId: 'docker_credentials') { 
-                        echo "Pushing image to DockerHub..."
-                        docker.push('my-image:latest')
+                    withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        bat 'docker login -u %USERNAME% -p %PASSWORD%'
+                        bat 'docker push my-image:latest'
                     }
                 }
             }
@@ -42,16 +42,16 @@ pipeline {
                 expression { return !params.IS_TAG_BUILD } 
             }
             steps {
-                
-                sh 'docker run -p 8000:80 my-image:latest' 
+                script {
+                    bat 'start /B docker run -p 8000:80 my-image:latest'
+                }
             }
         }
     }
 
     post {
         always {
-            cleanWs() // Clean workspace after each build
+            cleanWs() 
         }
-       
     }
 }
