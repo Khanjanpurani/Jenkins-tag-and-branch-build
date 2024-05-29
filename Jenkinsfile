@@ -40,8 +40,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         bat 'docker login -u %USERNAME% -p %PASSWORD%'
-                        bat 'docker tag my-image:latest your-dockerhub-username/my-image:${params.BRANCH_NAME}'
-                        bat 'docker push your-dockerhub-username/my-image:${params.BRANCH_NAME}'
+                        bat 'docker tag my-image:latest puranikhanjan307/my-image:${params.BRANCH_NAME}'
+                        bat 'docker push puranikhanjan307/my-image:${params.BRANCH_NAME}'
                     }
                 }
             }
@@ -53,19 +53,16 @@ pipeline {
             }
             steps {
                 script {
-                    // Stop any running containers to avoid conflicts
+                    
                     bat '''
                     docker stop my-container || exit 0
                     docker rm my-container || exit 0
                     '''
-                    
-                    // Run the container in detached mode
+        
                     bat 'docker run -d --name my-container -p 8000:80 my-image:latest'
 
-                    // Check running containers
                     bat 'docker ps'
 
-                    // Show logs for the new container
                     bat 'docker logs my-container'
                 }
             }
@@ -74,7 +71,7 @@ pipeline {
 
     post {
         always {
-            cleanWs() // Clean workspace after each build
+            cleanWs() 
         }
     }
 }
