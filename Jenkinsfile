@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        USERNAME = credentials('docker_username')
-        PASSWORD = credentials('docker_password')
-    }
 
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Branch or tag to build')
