@@ -9,14 +9,13 @@ pipeline {
 
     options {
         timestamps() // Enable timestamps for pipeline steps
-        buildDiscarder(logRetention: numBuilds(5)) // Keep only the last 5 builds
+        buildDiscarder(strategy: logRetention(numBuildsToKeep: 5)) // Keep only the last 5 builds
         disableConcurrentBuilds() // Prevent concurrent builds of the same job
     }
 
     parameters {
-        // Optional: Parameterize branch and tag names
         string(defaultValue: 'main', description: 'Branch to build and deploy from (default: main)', name: 'BRANCH_NAME')
-        booleanParameter(defaultValue: false, description: 'Trigger build on tag creation?', name: 'IS_TAG_BUILD')
+        booleanParam(defaultValue: false, description: 'Trigger build on tag creation?', name: 'IS_TAG_BUILD')
     }
 
     stages {
