@@ -7,7 +7,8 @@ pipeline {
         PASSWORD = credentials('docker_password')
     }
 
- 
+  
+
     parameters {
         string(defaultValue: 'main', description: 'Branch to build and deploy from (default: main)', name: 'BRANCH_NAME')
         booleanParam(defaultValue: false, description: 'Trigger build on tag creation?', name: 'IS_TAG_BUILD')
@@ -25,7 +26,11 @@ pipeline {
                 script {
                     // Handle potential IOException during build (adjust based on your build command)
                     try {
-                        sh 'docker build -t my-image:latest .' // Build Docker image
+                        if (env.OS == 'windows') {
+                            bat 'docker build -t my-image:latest .' // Use bat command on Windows
+                        } else {
+                            sh 'docker build -t my-image:latest .' // Use sh for shell commands on other OS
+                        }
                     } catch (java.io.IOException e) {
                         echo "Error during build: ${e.message}"
                     }
@@ -67,12 +72,12 @@ pipeline {
         success {
             // Add your success actions here (e.g., send notifications)
             // Example: Send email notification on success
-            emailext body: 'Build Successful!', subject: 'Jenkins - Build Success for ${JOB_NAME}', to: 'puranikhanjan@gmail.com'
+            emailext body: 'Build Successful!', subject: 'Jenkins - Build Success for ${JOB_NAME}', to: 'your_email@example.com'
         }
         failure {
             // Add your failure actions here (e.g., send notifications, trigger manual intervention)
             // Example: Send email notification on failure
-            emailext body: 'Build Failed!', subject: 'Jenkins - Build Failure for ${JOB_NAME}', to: 'puranikhanjan@gmail.com'
+            emailext body: 'Build Failed!', subject: 'Jenkins - Build Failure for ${JOB_NAME}', to: 'your_email@example.com'
         }
     }
 }
