@@ -21,7 +21,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Khanjanpurani/Jenkins-tag-and-branch-build.git' // Replace with your Git repository URL
+                git branch: "${params.BRANCH_NAME}", url: 'https://github.com/Khanjanpurani/Jenkins-Tag-and-Branch-Build.git' // Replace with your Git repository URL
             }
         }
 
@@ -63,10 +63,14 @@ pipeline {
             cleanWs() // Clean workspace after each build
         }
         success {
-            // Post-build actions on success (e.g., send notifications)
+            // Add your success actions here (e.g., send notifications)
+            // Example: Send email notification on success
+            emailext body: 'Build Successful!', subject: 'Jenkins - Build Success for ${JOB_NAME}', to: 'your_email@example.com'
         }
         failure {
-            // Post-build actions on failure (e.g., send notifications, trigger manual intervention)
+            // Add your failure actions here (e.g., send notifications, trigger manual intervention)
+            // Example: Send email notification on failure
+            emailext body: 'Build Failed!', subject: 'Jenkins - Build Failure for ${JOB_NAME}', to: 'your_email@example.com'
         }
     }
 }
