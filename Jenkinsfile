@@ -40,7 +40,7 @@ pipeline {
                 script {
                     def username = credentials('docker_username').username
                     def password = credentials('docker_password').password
-                    docker.withRegistry('https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects', credentialsId: 'dockerhub') { // Replace with your DockerHub URL
+                    docker.withRegistry('https://hub.docker.com/repository/docker/puranikhanjan307/jenkins-projects', credentialsId: 'docker_credentials') { // Replace with your DockerHub URL
                         echo "Pushing image to DockerHub..."
                         docker.push('my-image:latest')
                     }
