@@ -7,11 +7,7 @@ pipeline {
         PASSWORD = credentials('docker_password')
     }
 
-    options {
-        timestamps() // Enable timestamps for pipeline steps
-        buildDiscarder(strategy: logRetention(numBuildsToKeep: 5)) // Keep only the last 5 builds
-        disableConcurrentBuilds() // Prevent concurrent builds of the same job
-    }
+  
 
     parameters {
         string(defaultValue: 'main', description: 'Branch to build and deploy from (default: main)', name: 'BRANCH_NAME')
