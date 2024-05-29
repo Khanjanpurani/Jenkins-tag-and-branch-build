@@ -42,8 +42,10 @@ pipeline {
             steps {
                 script {
                     // Stop any running containers to avoid conflicts
-                    bat 'docker stop my-container || true'
-                    bat 'docker rm my-container || true'
+                    bat '''
+                    docker stop my-container || exit 0
+                    docker rm my-container || exit 0
+                    '''
                     
                     // Run the container in detached mode
                     bat 'docker run -d --name my-container -p 8000:80 my-image:latest'
